@@ -4,7 +4,7 @@ import json
 import os
 
 # Set page config
-st.set_page_config(page_title="OutSystems Certification Practice (Bilingual)", page_icon="🚀", layout="wide")
+st.set_page_config(page_title="OutSystems Certification Practice", page_icon="🚀", layout="wide")
 
 # Custom CSS for better aesthetics
 st.markdown("""
@@ -51,50 +51,85 @@ IMAGES = {
     "64": "Q64.png"
 }
 
+# Exam Versions Configuration
+EXAM_VERSIONS = {
+    "버전 1: 기본 모의고사 (KR/EN)": {
+        "file": "structured_data.json",
+        "has_bilingual": True,
+        "title": "🛡️ OutSystems Associate Certification Core Exam"
+    },
+    "버전 2: 신규 통합 모의고사 (70문항)": {
+        "file": "new_exam_data.json",
+        "has_bilingual": False,
+        "title": "📝 New Practice Exam (Core + Scenario)"
+    },
+    "버전 3: 고난도 시나리오 (100문항)": {
+        "file": "scenario_exam_data.json",
+        "has_bilingual": False,
+        "title": "🌪️ Advanced Scenario Mock Exam"
+    }
+}
+
 # Load data
 @st.cache_data
-def load_quiz_data():
-    questions_file = "structured_data.json"
-    trans_file = "translations.json"
-    
+def load_quiz_data(file_path):
     questions = []
-    if os.path.exists(questions_file):
-        with open(questions_file, "r", encoding="utf-8") as f:
+    if os.path.exists(file_path):
+        with open(file_path, "r", encoding="utf-8") as f:
             questions = json.load(f)
             
     translations = {}
     opt_translations = {}
-    if os.path.exists(trans_file):
-        with open(trans_file, "r", encoding="utf-8") as f:
-            t_data = json.load(f)
-            translations = t_data.get('translations', {})
-            opt_translations = t_data.get('option_translations', {})
+    if file_path == "structured_data.json":
+        trans_file = "translations.json"
+        if os.path.exists(trans_file):
+            with open(trans_file, "r", encoding="utf-8") as f:
+                t_data = json.load(f)
+                translations = t_data.get('translations', {})
+                opt_translations = t_data.get('option_translations', {})
             
     return questions, translations, opt_translations
 
-questions, trans, opt_trans = load_quiz_data()
+# Sidebar for Version Selection
+st.sidebar.title("📚 Exam Selection")
+selected_version_name = st.sidebar.selectbox("시험 버전을 선택하세요:", list(EXAM_VERSIONS.keys()))
+selected_version = EXAM_VERSIONS[selected_version_name]
+
+# Load specific data
+questions, trans, opt_trans = load_quiz_data(selected_version["file"])
 
 # Session State for User Answers
+if 'current_version' not in st.session_state or st.session_state.current_version != selected_version_name:
+    st.session_state.user_answers = {}
+    st.session_state.submitted = False
+    st.session_state.current_version = selected_version_name
+
 if 'user_answers' not in st.session_state:
     st.session_state.user_answers = {}
 if 'submitted' not in st.session_state:
     st.session_state.submitted = False
 
-# Sidebar for Navigation and Progress
+# Sidebar Controls
+st.sidebar.markdown("---")
 st.sidebar.title("🎮 Quiz Control")
 if st.sidebar.button("Reset Quiz"):
     st.session_state.user_answers = {}
     st.session_state.submitted = False
     st.rerun()
 
-st.title("🛡️ OutSystems Associate Certification Practice Exam (KR/EN)")
+st.title(f"{selected_version['title']}")
+st.info(f"선택된 모의고사: {selected_version_name}")
 st.write("---")
 
 def get_bilingual_q(q_text):
+    if not selected_version["has_bilingual"]:
+        return q_text
     t = trans.get(q_text, "")
     return f"{q_text} ({t})" if t else q_text
 
 def get_bilingual_opt(opt_text):
+    if not selected_version["has_bilingual"]:
+        return opt_text
     t = opt_trans.get(opt_text, "")
     return f"{opt_text} ({t})" if t else opt_text
 
@@ -102,13 +137,13 @@ if questions:
     if not st.session_state.submitted:
         # Quiz Form
         with st.form("quiz_form"):
-            for q in questions:
+            for idx, q in enumerate(questions):
                 st.markdown(f"#### 문제 {q['id']}")
                 st.markdown(get_bilingual_q(q['question']))
                 
-                # Show image if exists
-                if q['id'] in IMAGES and os.path.exists(IMAGES[q['id']]):
-                    st.image(IMAGES[q['id']], caption=f"Reference for Question {q['id']}", width='stretch')
+                # Show image if exists (only for version 1 usually, but generic-safe)
+                if q['id'] in IMAGES and selected_version["has_bilingual"] and os.path.exists(IMAGES[q['id']]):
+                    st.image(IMAGES[q['id']], caption=f"Reference for Question {q['id']}", width=600)
                 
                 # Format options for display
                 options_list = [f"{opt['code']}. {get_bilingual_opt(opt['text'])}" for opt in q['options']]
@@ -117,7 +152,7 @@ if questions:
                     f"Select your answer for Question {q['id']}:",
                     options_list,
                     index=None,
-                    key=f"q_{q['id']}",
+                    key=f"q_{idx}_{q['id']}",
                     label_visibility="collapsed"
                 )
                 
@@ -125,7 +160,7 @@ if questions:
                 st.session_state.user_answers[q['id']] = selected[0] if selected else None
                 st.write("") # Spacer
 
-            submit_btn = st.form_submit_button("Submit Exam / 답안 제출", width='stretch')
+            submit_btn = st.form_submit_button("Submit Exam / 답안 제출", use_container_width=True)
             if submit_btn:
                 st.session_state.submitted = True
                 st.rerun()
@@ -163,12 +198,12 @@ if questions:
             correct_choice = q['answer_code']
             is_correct = user_choice == correct_choice
             
-            with st.expander(f"문제 {q['id']}: {'✅ Correct' if is_correct else '❌ Incorrect'}", expanded=True):
+            with st.expander(f"문제 {q['id']}: {'✅ Correct' if is_correct else '❌ Incorrect'}", expanded=not is_correct):
                 st.markdown(f"**Question:** {get_bilingual_q(q['question'])}")
                 
                 # Show image if exists
-                if q['id'] in IMAGES and os.path.exists(IMAGES[q['id']]):
-                    st.image(IMAGES[q['id']], width='stretch')
+                if q['id'] in IMAGES and selected_version["has_bilingual"] and os.path.exists(IMAGES[q['id']]):
+                    st.image(IMAGES[q['id']], width=600)
 
                 # Display options
                 for opt in q['options']:
@@ -196,4 +231,4 @@ if questions:
             st.rerun()
 
 else:
-    st.error("Question data not found. Please ensure 'structured_data.json' exists.")
+    st.error(f"Question data not found. Please ensure '{selected_version['file']}' exists.")
