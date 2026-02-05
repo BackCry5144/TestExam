@@ -43,7 +43,7 @@
   },
   {
     "id": "3",
-    "question": "In Rich Widgets, the List_Navigation widget…..",
+    "question": "[Traditional] In Rich Widgets, the List_Navigation widget…..",
     "options": [
       {
         "code": "A",
@@ -227,7 +227,7 @@
   },
   {
     "id": "11",
-    "question": "Consider a Web Screen with a Button that is associated to a Screen Action. An Ajax Refresh statement in that Screen Action allows to refresh part of that Web Screen, ...",
+    "question": "[Traditional] Consider a Web Screen with a Button that is associated to a Screen Action. An Ajax Refresh statement in that Screen Action allows to refresh part of that Web Screen, ...",
     "options": [
       {
         "code": "A",
@@ -298,7 +298,7 @@
   },
   {
     "id": "14",
-    "question": "Regarding Web Blocks in Outsystems, select to statement that is true.",
+    "question": "[Traditional] Regarding Web Blocks in Outsystems, select to statement that is true.",
     "options": [
       {
         "code": "A",
@@ -323,7 +323,7 @@
   },
   {
     "id": "15",
-    "question": "Consider a Web Screen with a Button that is associated to a Screen Action. An Ajax Refresh statement in that Screen Action allows to refresh part of that Web Screen, ...",
+    "question": "[Traditional] Consider a Web Screen with a Button that is associated to a Screen Action. An Ajax Refresh statement in that Screen Action allows to refresh part of that Web Screen, ...",
     "options": [
       {
         "code": "A",
@@ -590,7 +590,7 @@
   },
   {
     "id": "26",
-    "question": "Regarding Session Variable, which of the following options is true?",
+    "question": "[Traditional] Regarding Session Variable, which of the following options is true?",
     "options": [
       {
         "code": "A",
@@ -724,7 +724,7 @@
   },
   {
     "id": "32",
-    "question": "Regarding Preparation in Outsystems, select to statement that is true.",
+    "question": "[Traditional] Regarding Preparation in Outsystems, select to statement that is true.",
     "options": [
       {
         "code": "A",
@@ -820,7 +820,7 @@
   },
   {
     "id": "36",
-    "question": "Inside the Preparation of Web Screen, the Destination statement...",
+    "question": "[Traditional] Inside the Preparation of Web Screen, the Destination statement...",
     "options": [
       {
         "code": "A",
@@ -937,7 +937,7 @@
   },
   {
     "id": "41",
-    "question": "To replace data on a widget with automatic data replacement (Tables Records, List Records, Form,...)",
+    "question": "[Traditional] To replace data on a widget with automatic data replacement (Tables Records, List Records, Form,...)",
     "options": [
       {
         "code": "A",
@@ -1687,7 +1687,7 @@
   },
   {
     "id": "71",
-    "question": "What is true in respect of the web blocks?",
+    "question": "[Traditional] What is true in respect of the web blocks?",
     "options": [
       {
         "code": "A",
