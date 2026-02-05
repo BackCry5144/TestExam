@@ -3,108 +3,216 @@ import json
 import re
 import os
 
-def parse_original_questions(file_path):
+def parse_questions_file(file_path, stop_at_header=None):
+    """
+    Parses the question file (e.g., New_Practice_Exam.md or New_Practice_Exam_Scenairo.md).
+    Extracts the updated logic where questions start with:
+    - **문제 01. ...** (bold + '문제 ' prefix)
+    - **01. ...** (bold + number)
+    - 01. ...
+    
+    stop_at_header: If provided, stops parsing when a line containing this string is found.
+    """
+    if not os.path.exists(file_path):
+        print(f"File not found: {file_path}")
+        return {}
+
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
+        
+    # If stop_at_header is provided, truncate content
+    if stop_at_header:
+        parts = content.split(stop_at_header)
+        content = parts[0]
+
+    # Split by double newlines or lines that look like a header
+    lines = content.split('\n')
     
-    # More robust split for the original files
-    sections = re.split(r'\n\*\*|\n### ', content)
-    questions_list = []
+    questions_map = {}
+    current_q_id = None
+    current_q_text = ""
+    current_options = []
+    
+    # Regex for question start: 
+    # Matches "**문제 01." or "**01." or "01." or "문제 01."
+    # Group 2 is the ID, Group 3 is the text
+    q_start_pattern = re.compile(r'^\**\s*(문제\s*)?(\d+)\.\s*(.*?)(\**)?$')
+    
+    # Regex for options: Matches "A. " or "A) "
+    opt_pattern = re.compile(r'^([A-D])[\.\)]\s*(.*)')
+
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+            
+        # Check if line is a question start
+        q_match = q_start_pattern.match(line)
+        if q_match:
+            # Save previous question if exists
+            if current_q_id:
+                questions_map[current_q_id] = {
+                    "question": current_q_text,
+                    "options": current_options
+                }
+            
+            # Reset for new question
+            current_q_id = str(int(q_match.group(2))) # Normalize "01" to "1"
+            # Remove any trailing ** if present in the text group or separate
+            current_q_text = q_match.group(3).strip().rstrip('*')
+            current_options = []
+            continue
+        
+        # Check if line is an option
+        opt_match = opt_pattern.match(line)
+        if opt_match and current_q_id:
+            current_options.append({
+                "code": opt_match.group(1),
+                "text": opt_match.group(2).strip()
+            })
+    
+    # Add the last question
+    if current_q_id:
+        questions_map[current_q_id] = {
+            "question": current_q_text,
+            "options": current_options
+        }
+        
+    return questions_map
+
+def parse_answers_file(file_path, stop_at_header=None):
+    """
+    Parses the answer/explanation file.
+    stop_at_header: If provided, stops parsing when a line containing this string is found.
+    """
+    if not os.path.exists(file_path):
+        print(f"File not found: {file_path}")
+        return {}
+
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+        
+    # If stop_at_header is provided, truncate content
+    if stop_at_header:
+        parts = content.split(stop_at_header)
+        content = parts[0]
+
+    answers_map = {}
+    
+    # Strategy 1: Parse the ### headers with answers below them
+    sections = re.split(r'\n### ', content)
     
     for section in sections:
         lines = section.strip().split('\n')
         if not lines:
             continue
             
-        # Match "문제 01. ..." or "01. ..."
-        title_match = re.match(r'^(문제\s*|)(\d+)\.\s*(.*)', lines[0])
-        if not title_match:
-            continue
+        header = lines[0]
+        id_match = re.search(r'(문제\s*)?(\d+)\.', header)
+        if not id_match:
+            id_match = re.match(r'^(\d+)(\.|\s|$)', header)
+        
+        if id_match:
+            q_id = str(int(id_match.group(2) if len(id_match.groups()) > 1 else id_match.group(1)))
             
-        question_text = title_match.group(3).strip().rstrip('*').strip()
-        
-        options = []
-        for line in lines[1:]:
-            opt_match = re.match(r'^([A-D])\.\s*(.*)', line.strip())
-            if opt_match:
-                options.append({
-                    "code": opt_match.group(1),
-                    "text": opt_match.group(2).strip()
-                })
-        
-        if question_text and options:
-            questions_list.append({
-                "question": question_text,
-                "options": options
-            })
-    return questions_list
+            answer_code = ""
+            explanation_lines = []
+            is_explanation = False
+            
+            for line in lines[1:]:
+                line = line.strip()
+                ans_match = re.search(r'\[x\]\s*\**([A-D])[\.\)]', line)
+                if ans_match:
+                    answer_code = ans_match.group(1)
+                
+                if "**Answer:" in line:
+                    ans_text_match = re.search(r'\*\*Answer:\s*([A-D])', line)
+                    if ans_text_match:
+                        answer_code = ans_text_match.group(1)
 
-def parse_answers_only(ans_file):
-    with open(ans_file, 'r', encoding='utf-8') as f:
-        content = f.read()
+                if "> **해설**" in line or "**해설**" in line:
+                    is_explanation = True
+                    continue
+                
+                if is_explanation:
+                    if line.startswith(">"):
+                        line = line.lstrip(">").strip()
+                    explanation_lines.append(line)
+            
+            explanation = "\n".join(explanation_lines).strip()
+            
+            if q_id not in answers_map:
+                answers_map[q_id] = {}
+            
+            if answer_code:
+                answers_map[q_id]['answer_code'] = answer_code
+            if explanation:
+                answers_map[q_id]['explanation'] = explanation
 
-    # Split by ### 문제 or ### [Number]
-    sections = re.split(r'\n### ', content)
-    parsed_questions = []
+    # Strategy 2: Parse Quick Answer Table
+    tables = re.findall(r'\|.*\|\n\|[-|\s]+\|\n\|.*\|', content)
+    for table in tables:
+        lines = table.strip().split('\n')
+        ids = [x.strip() for x in lines[0].strip('|').split('|')]
+        ans = [x.strip().replace('①','A').replace('②','B').replace('③','C').replace('④','D') for x in lines[2].strip('|').split('|')]
+        
+        if len(ids) == len(ans):
+            for i in range(len(ids)):
+                if ids[i].isdigit():
+                    q_id = str(int(ids[i]))
+                    code = ans[i]
+                    if q_id not in answers_map:
+                        answers_map[q_id] = {}
+                    if 'answer_code' not in answers_map[q_id] or not answers_map[q_id]['answer_code']:
+                        answers_map[q_id]['answer_code'] = code
+
+    return answers_map
+
+def merge_and_save(questions_file, answers_file, output_file, stop_at_header=None):
+    print(f"Processing {questions_file} + {answers_file} -> {output_file}")
     
-    for section in sections[1:]:
-        lines = section.strip().split('\n')
-        if not lines:
-            continue
-            
-        # Extract title/question
-        question_line = lines[0]
-        # Remove numbers like 01., 문제 01.
-        question_text = re.sub(r'^(문제\s*\d+\.\s*|\d+\.\s*)', '', question_line).strip()
+    # Pass 'stop_at_header' to BOTH functions
+    q_map = parse_questions_file(questions_file, stop_at_header)
+    a_map = parse_answers_file(answers_file, stop_at_header)
+    
+    final_list = []
+    
+    # Iterate through sorted IDs from QUESTIONS file only
+    all_ids = sorted([int(k) for k in q_map.keys()])
+    
+    for int_id in all_ids:
+        qid = str(int_id)
+        q_data = q_map[qid]
+        a_data = a_map.get(qid, {})
         
-        options = []
-        answer_code = ""
-        for line in lines[1:10]: # Check first few lines for options
-            ans_match = re.match(r'- \[( |x)\] (\*\*)?([A-D])\. (.*?)(\*\*)?$', line.strip())
-            if ans_match:
-                is_correct = ans_match.group(1) == 'x'
-                code = ans_match.group(3)
-                text = ans_match.group(4).strip()
-                options.append({"code": code, "text": text})
-                if is_correct:
-                    answer_code = code
+        merged_item = {
+            "id": qid,
+            "question": q_data['question'],
+            "options": q_data['options'],
+            "answer_code": a_data.get('answer_code', ""),
+            "explanation": a_data.get('explanation', "")
+        }
+        final_list.append(merged_item)
         
-        # Extract explanation
-        explanation = ""
-        expl_start = False
-        expl_lines = []
-        for line in lines:
-            if '> **해설**' in line:
-                expl_start = True
-                continue
-            if expl_start and line.strip().startswith('>'):
-                expl_lines.append(line.strip().lstrip('>').strip())
-        explanation = "\n".join(expl_lines)
-        
-        parsed_questions.append({
-            "question": question_text,
-            "options": options,
-            "answer_code": answer_code,
-            "explanation": explanation
-        })
-            
-    return parsed_questions
+    print(f"Total merged questions: {len(final_list)}")
+    
+    with open(output_file, 'w', encoding='utf-8') as f:
+        json.dump(final_list, f, ensure_ascii=False, indent=2)
 
-def save_merged_questions(data, filename):
-    # Add unique sequential IDs
-    for idx, q in enumerate(data):
-        q['id'] = str(idx + 1)
-        
-    with open(filename, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+# --- Main Execution ---
 
-# Parse New Exam Answer file directly (it has almost everything)
-new_exam_data = parse_answers_only('New_Practice_Exam_Answer.md')
-save_merged_questions(new_exam_data, 'new_exam_data.json')
+# 1. New Practice Exam
+# Stop parsing when "고난도 시나리오" header is found in BOTH question and answer files
+merge_and_save(
+    'New_Practice_Exam.md', 
+    'New_Practice_Exam_Answer.md', 
+    'new_exam_data.json',
+    stop_at_header="고난도 시나리오" 
+)
 
-# Parse Scenario Exam Answer file directly
-scenario_exam_data = parse_answers_only('New_Practice_Exam_Scenairo_Answer.md')
-save_merged_questions(scenario_exam_data, 'scenario_exam_data.json')
-
-print(f"Parsed {len(new_exam_data)} questions for New Exam")
-print(f"Parsed {len(scenario_exam_data)} questions for Scenario Exam")
+# 2. Scenario Exam
+merge_and_save(
+    'New_Practice_Exam_Scenairo.md',
+    'New_Practice_Exam_Scenairo_Answer.md',
+    'scenario_exam_data.json'
+)
