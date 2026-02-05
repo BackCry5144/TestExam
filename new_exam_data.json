@@ -309,7 +309,7 @@
       }
     ],
     "answer_code": "C",
-    "explanation": "**Answer: C**\n체크 여부는 True/False 상태이므로 Boolean 변수가 필요합니다.\n\n---\n\n## [Part 2. 로직]"
+    "explanation": "**Answer: C**\n체크 여부는 True/False 상태이므로 Boolean 변수가 필요합니다."
   },
   {
     "id": "14",
@@ -573,7 +573,7 @@
       }
     ],
     "answer_code": "B",
-    "explanation": "**Answer: B**\n필수값 누락은 컴파일 오류로 이어집니다.\n\n---\n\n## [Part 3. 데이터 페칭]"
+    "explanation": "**Answer: B**\n필수값 누락은 컴파일 오류로 이어집니다."
   },
   {
     "id": "25",
@@ -813,7 +813,7 @@
       }
     ],
     "answer_code": "B",
-    "explanation": "**Answer: B**\n복합적인 데이터 가공 후 여러 결과를 보낼 때 유용합니다.\n\n---\n\n## [Part 4. 데이터 모델링]"
+    "explanation": "**Answer: B**\n복합적인 데이터 가공 후 여러 결과를 보낼 때 유용합니다."
   },
   {
     "id": "35",
@@ -957,7 +957,7 @@
       }
     ],
     "answer_code": "D",
-    "explanation": "**Answer: D**\nId, Label, Order, Is_Active가 기본 4종 세트입니다.\n\n---\n\n## [Part 5. 리액티브 앱 & 라이프사이클]"
+    "explanation": "**Answer: D**\nId, Label, Order, Is_Active가 기본 4종 세트입니다."
   },
   {
     "id": "41",
@@ -1101,7 +1101,7 @@
       }
     ],
     "answer_code": "B",
-    "explanation": "**Answer: B**\nUI 업데이트 시마다 호출됩니다.\n\n---\n\n## [Part 6. 아키텍처 & 보안]"
+    "explanation": "**Answer: B**\nUI 업데이트 시마다 호출됩니다."
   },
   {
     "id": "47",
@@ -1197,6 +1197,6 @@
       }
     ],
     "answer_code": "B",
-    "explanation": "**Answer: B**\nRole 생성 시 제공되는 빌트인 시스템 함수입니다.\n\n---\n\n## 🌪️"
+    "explanation": "**Answer: B**\nRole 생성 시 제공되는 빌트인 시스템 함수입니다."
   }
 ]
