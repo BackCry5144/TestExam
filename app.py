@@ -198,7 +198,7 @@ if questions:
             correct_choice = q['answer_code']
             is_correct = user_choice == correct_choice
             
-            with st.expander(f"문제 {q['id']}: {'✅ Correct' if is_correct else '❌ Incorrect'}", expanded=not is_correct):
+            with st.expander(f"문제 {q['id']}: {'✅ Correct' if is_correct else '❌ Incorrect'}", expanded=True):
                 st.markdown(f"**Question:** {get_bilingual_q(q['question'])}")
                 
                 # Show image if exists
