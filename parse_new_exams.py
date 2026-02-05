@@ -135,6 +135,10 @@ def parse_answers_file(file_path, stop_at_header=None):
                     continue
                 
                 if is_explanation:
+                    # Skip section dividers and headers that might be caught in the split
+                    if line.strip().startswith('---') or line.strip().startswith('##'):
+                        continue
+                        
                     if line.startswith(">"):
                         line = line.lstrip(">").strip()
                     explanation_lines.append(line)
