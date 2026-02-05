@@ -202,12 +202,13 @@ def merge_and_save(questions_file, answers_file, output_file, stop_at_header=Non
 # --- Main Execution ---
 
 # 1. New Practice Exam
-# Stop parsing when "고난도 시나리오" header is found in BOTH question and answer files
+# Stop parsing when "고난도 시나리오 모의고사" header is found in BOTH question and answer files
+# This is more specific than "고난도 시나리오" which appears in the quick answer table header
 merge_and_save(
     'New_Practice_Exam.md', 
     'New_Practice_Exam_Answer.md', 
     'new_exam_data.json',
-    stop_at_header="고난도 시나리오" 
+    stop_at_header="고난도 시나리오 모의고사" 
 )
 
 # 2. Scenario Exam
