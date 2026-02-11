@@ -152,7 +152,7 @@ def parse_answers_file(file_path, stop_at_header=None):
                 answers_map[q_id]['answer_code'] = answer_code
             if explanation:
                 answers_map[q_id]['explanation'] = explanation
-
+                
     # Strategy 2: Parse Quick Answer Table
     tables = re.findall(r'\|.*\|\n\|[-|\s]+\|\n\|.*\|', content)
     for table in tables:
@@ -276,23 +276,23 @@ def merge_and_save(questions_file, answers_file, output_file, stop_at_header=Non
 if __name__ == "__main__":
     # 1. New Practice Exam
     merge_and_save(
-        'New_Practice_Exam.md', 
-        'New_Practice_Exam_Answer.md', 
+        'sources/New_Practice_Exam.md', 
+        'sources/New_Practice_Exam_Answer.md', 
         'new_exam_data.json',
         stop_at_header="고난도 시나리오 모의고사" 
     )
 
     # 2. Scenario Exam
     merge_and_save(
-        'New_Practice_Exam_Scenairo.md',
-        'New_Practice_Exam_Scenairo_Answer.md',
+        'sources/New_Practice_Exam_Scenairo.md',
+        'sources/New_Practice_Exam_Scenairo_Answer.md',
         'scenario_exam_data.json'
     )
 
     # 3. Sample Exam Set 1
     merge_and_save(
-        r'SampleExam\SampleExam_Set1.md',
-        r'SampleExam_Answer\SampleExam_Set1_Answer.md',
+        r'sources/SampleExam/SampleExam_Set1.md',
+        r'sources/SampleExam_Answer/SampleExam_Set1_Answer.md',
         'sample_exam_set1.json',
         stop_at_header="#### **[상세 해설]**",
         is_sample_format=True
@@ -300,8 +300,8 @@ if __name__ == "__main__":
 
     # 4. Sample Exam Set 2
     merge_and_save(
-        r'SampleExam\SampleExam_Set2.md',
-        r'SampleExam_Answer\SampleExam_Set2_Answer.md',
+        r'sources/SampleExam/SampleExam_Set2.md',
+        r'sources/SampleExam_Answer/SampleExam_Set2_Answer.md',
         'sample_exam_set2.json',
         stop_at_header="#### **[상세 해설]**",
         is_sample_format=True
@@ -309,8 +309,8 @@ if __name__ == "__main__":
 
     # 5. Sample Exam Set 3
     merge_and_save(
-        r'SampleExam\SampleExam_Set3.md',
-        r'SampleExam_Answer\SampleExam_Set3_Answer.md',
+        r'sources/SampleExam/SampleExam_Set3.md',
+        r'sources/SampleExam_Answer/SampleExam_Set3_Answer.md',
         'sample_exam_set3.json',
         stop_at_header="#### **[상세 해설]**",
         is_sample_format=True
