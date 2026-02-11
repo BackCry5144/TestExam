@@ -172,12 +172,80 @@ def parse_answers_file(file_path, stop_at_header=None):
 
     return answers_map
 
-def merge_and_save(questions_file, answers_file, output_file, stop_at_header=None):
+def parse_sample_answers_file(file_path):
+    """
+    Parses the sample exam answer file format:
+    **1. 정답: C**
+    
+    * **해설:** Explanation text...
+    """
+    if not os.path.exists(file_path):
+        print(f"File not found: {file_path}")
+        return {}
+
+    with open(file_path, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+
+    answers_map = {}
+    current_q_id = None
+    
+    # Regex for Answer line: matches "**1. 정답: C**" or "**1. 정답: C"
+    ans_pattern = re.compile(r'^\**(\d+)\.\s*정답:\s*([A-D])\**')
+    
+    explanation_buffer = []
+
+    def flush_explanation(qid, buffer):
+        if qid and buffer:
+             original = "\n".join(buffer).strip()
+             final_expl = original
+             # Remove prefix checking
+             if qid not in answers_map:
+                 answers_map[qid] = {}
+             answers_map[qid]['explanation'] = final_expl
+
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+            
+        ans_match = ans_pattern.match(line)
+        if ans_match:
+            # First, finish previous question explanation if exists
+            flush_explanation(current_q_id, explanation_buffer)
+            
+            # Start new question
+            current_q_id = str(int(ans_match.group(1)))
+            answer_code = ans_match.group(2)
+            explanation_buffer = []
+            
+            if current_q_id not in answers_map:
+                answers_map[current_q_id] = {}
+            answers_map[current_q_id]['answer_code'] = answer_code
+            continue
+            
+        # Collect explanation
+        # Remove "* **해설:**" prefix if present
+        if line.startswith('* **해설:**') or line.startswith('**해설:**'):
+             line = re.sub(r'^(\*\s*)?\**해설:\**\s*', '', line)
+        
+        if current_q_id is not None:
+            explanation_buffer.append(line)
+            
+    # Flush last one
+    flush_explanation(current_q_id, explanation_buffer)
+        
+    return answers_map
+
+def merge_and_save(questions_file, answers_file, output_file, stop_at_header=None, is_sample_format=False):
     print(f"Processing {questions_file} + {answers_file} -> {output_file}")
     
-    # Pass 'stop_at_header' to BOTH functions
+    # Pass 'stop_at_header' to parse_questions_file
     q_map = parse_questions_file(questions_file, stop_at_header)
-    a_map = parse_answers_file(answers_file, stop_at_header)
+    
+    if is_sample_format:
+        a_map = parse_sample_answers_file(answers_file)
+    else:
+        a_map = parse_answers_file(answers_file, stop_at_header)
     
     final_list = []
     
@@ -205,19 +273,45 @@ def merge_and_save(questions_file, answers_file, output_file, stop_at_header=Non
 
 # --- Main Execution ---
 
-# 1. New Practice Exam
-# Stop parsing when "고난도 시나리오 모의고사" header is found in BOTH question and answer files
-# This is more specific than "고난도 시나리오" which appears in the quick answer table header
-merge_and_save(
-    'New_Practice_Exam.md', 
-    'New_Practice_Exam_Answer.md', 
-    'new_exam_data.json',
-    stop_at_header="고난도 시나리오 모의고사" 
-)
+if __name__ == "__main__":
+    # 1. New Practice Exam
+    merge_and_save(
+        'New_Practice_Exam.md', 
+        'New_Practice_Exam_Answer.md', 
+        'new_exam_data.json',
+        stop_at_header="고난도 시나리오 모의고사" 
+    )
 
-# 2. Scenario Exam
-merge_and_save(
-    'New_Practice_Exam_Scenairo.md',
-    'New_Practice_Exam_Scenairo_Answer.md',
-    'scenario_exam_data.json'
-)
+    # 2. Scenario Exam
+    merge_and_save(
+        'New_Practice_Exam_Scenairo.md',
+        'New_Practice_Exam_Scenairo_Answer.md',
+        'scenario_exam_data.json'
+    )
+
+    # 3. Sample Exam Set 1
+    merge_and_save(
+        r'SampleExam\SampleExam_Set1.md',
+        r'SampleExam_Answer\SampleExam_Set1_Answer.md',
+        'sample_exam_set1.json',
+        stop_at_header="#### **[상세 해설]**",
+        is_sample_format=True
+    )
+
+    # 4. Sample Exam Set 2
+    merge_and_save(
+        r'SampleExam\SampleExam_Set2.md',
+        r'SampleExam_Answer\SampleExam_Set2_Answer.md',
+        'sample_exam_set2.json',
+        stop_at_header="#### **[상세 해설]**",
+        is_sample_format=True
+    )
+
+    # 5. Sample Exam Set 3
+    merge_and_save(
+        r'SampleExam\SampleExam_Set3.md',
+        r'SampleExam_Answer\SampleExam_Set3_Answer.md',
+        'sample_exam_set3.json',
+        stop_at_header="#### **[상세 해설]**",
+        is_sample_format=True
+    )

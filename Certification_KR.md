@@ -69,7 +69,7 @@ Select the correct option regarding the Input Widget. (Input 위젯에 대한 �
 
 ---
 
-## 문제 3
+## 문제 3(Treditional)
 
 In Rich Widgets, the List_Navigation widget….. (Rich Widget에서 List_Navigation 위젯은...)
 
@@ -116,6 +116,16 @@ Style classes can be overriden, so if you have the same style class defined in a
 > OutSystems에서 스타일 클래스는 계층 구조에 따라 우선순위가 결정됩니다. 동일한 스타일 클래
 > 스가 Web Block, Screen, Theme에 정의된 경우, 가장 구체적인 수준인 **Screen**에 정의된 스타
 > 일이 우선적으로 적용됩니다. 따라서 정답은 **B. The one in the Screen**입니다.
+
+📊 스타일 우선순위 요약표 (시험 족보)
+
+| 순위 | 정의 위치 | 설명 |
+| :---: | :--- | :--- |
+| 1 (최고) | Inline Style | 위젯 속성에 직접 작성 |
+| 2 | Screen StyleSheet | 특정 화면 전용 스타일 |
+| 3 | Block StyleSheet | 재사용 컴포넌트 전용 스타일 |
+| 4 | Theme StyleSheet | 모듈 전체 공통 스타일 |
+| 5 (최저) | Base Theme | 시스템 기본 제공 스타일 |
 
 ---
 
@@ -203,7 +213,7 @@ The Check Box widget is bound to a Variable of type. (Check Box 위젯은 어떤
 
 ---
 
-## 문제 11
+## 문제 11(Treditional)
 
 Consider a Web Screen with a Button that is associated to a Screen Action. An Ajax Refresh statement in that Screen Action allows to refresh part of that Web Screen, ... (Screen Action과 연결된 버튼이 있는 웹 화면을 고려하세요. 해당 Screen Action의 Ajax Refresh 구문은 웹 화면의 일부를 새로 고칠 수 있도록 허용합니다...)
 
@@ -254,9 +264,18 @@ Output parameters are available ... (출력 매개변수(Output parameters)를 �
 > 해당 액션을 호출한 외부 범위에서도 사용할 수 있습니다. 따라서 정답은 **C. Both inside and
 > outside their implementation scope**입니다.
 
+| 변수 종류 | 정의 위치 | 외부 참조 가능 여부 | 수명 (Persistence) |
+| :--- | :--- | :--- | :--- |
+| Local Variable | Action / Screen | 불가능 | 해당 스코프 종료 시 소멸 |
+| Input Parameter | Action / Block | 가능 (호출 시 입력) | 호출 동안만 유지 |
+| Output Parameter | Action | 가능 (호출 후 참조) | 호출 동안만 유지 |
+| Client Variable | Module | 가능 (앱 전체) | 지속적 (Persistence) |
+| Site Property | Module | 가능 (서버 전체) | 영구적 (Permanent) |
+
+
 ---
 
-## 문제 14
+## 문제 14(Treditional)
 
 Regarding Web Blocks in Outsystems, select to statement that is true. (OutSystems의 Web Block에 대해 다음 중 옳은 문장을 선택하세요.)
 
@@ -274,7 +293,7 @@ Regarding Web Blocks in Outsystems, select to statement that is true. (OutSystem
 
 ---
 
-## 문제 15
+## 문제 15(Treditional)
 
 Consider a Web Screen with a Button that is associated to a Screen Action. An Ajax Refresh statement in that Screen Action allows to refresh part of that Web Screen, ... (Screen Action과 연결된 버튼이 있는 웹 화면을 고려하세요. 해당 Screen Action의 Ajax Refresh 구문은 웹 화면의 일부를 새로 고칠 수 있도록 허용합니다...)
 
@@ -359,6 +378,12 @@ What is the output of an aggregate when no records meet the criteria? (기준을
 > OutSystems에서 Aggregate가 기준을 충족하는 레코드를 찾지 못하면 빈 리스트(Empty List)를 반
 > 환합니다. Null이나 기본 데이터가 포함된 레코드는 반환되지 않습니다. 따라서 정답은 **B. Empty
 > list**입니다.
+
+
+속성,값,용도,비고
+.Count,100,전체 페이지 수 계산용,사용 시에만 서버에서 계산됨
+.List.Length,50,루프(For Each) 돌릴 횟수,메모리에 실제 있는 양
+.List.Empty,False,데이터 존재 여부 확인,Length > 0과 같음
 
 ---
 
@@ -465,7 +490,7 @@ Regarding property Escape Content of Expression, which of the following options 
 
 ---
 
-## 문제 26
+## 문제 26(Treditional)
 
 Regarding Session Variable, which of the following options is true? (세션 변수(Session Variable)에 대해 다음 중 옳은 것은 무엇입니까?)
 
@@ -553,6 +578,7 @@ What types of applications can be created in OutSystems? (OutSystems에서 어�
 ## 문제 31
 
 Style load order (스타일 로드 순서)
+*** 정말 이해가 안가지만 theme라고만 명시하면 커스텀 테마임. ***
 
 - [ ] A. Screen & Email -> Web block -> theme (화면 및 이메일 -> Web block -> Theme)
 - [ ] B. theme -> Web block -> Screen & Email (Theme -> Web block -> 화면 및 이메일)
@@ -571,7 +597,7 @@ Style load order (스타일 로드 순서)
 
 ---
 
-## 문제 32
+## 문제 32(Treditional)
 
 Regarding Preparation in Outsystems, select to statement that is true. (OutSystems의 Preparation에 대해 옳은 문장을 선택하세요.)
 
@@ -641,7 +667,7 @@ When there is a change in the Producer module, which statement later about the C
 
 ---
 
-## 문제 36
+## 문제 36(Treditional)
 
 Inside the Preparation of Web Screen, the Destination statement... (웹 화면의 Preparation 내에서 Destination 문은...)
 

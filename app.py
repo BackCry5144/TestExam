@@ -67,6 +67,21 @@ EXAM_VERSIONS = {
         "file": "scenario_exam_data.json",
         "has_bilingual": False,
         "title": "🌪️ Advanced Scenario Mock Exam"
+    },
+    "버전 4: Sample Exam Set 1 (50문항)": {
+        "file": "sample_exam_set1.json",
+        "has_bilingual": False,
+        "title": "📑 Sample Practice Exam Set 1"
+    },
+    "버전 5: Sample Exam Set 2 (50문항)": {
+        "file": "sample_exam_set2.json",
+        "has_bilingual": False,
+        "title": "📑 Sample Practice Exam Set 2"
+    },
+    "버전 6: Sample Exam Set 3 (50문항)": {
+        "file": "sample_exam_set3.json",
+        "has_bilingual": False,
+        "title": "📑 Sample Practice Exam Set 3"
     }
 }
 
